@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StudyAI - Premium AI Tutor for JEE/NEET</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@hello-pangea/dnd@16/dist/umd/dnd.umd.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .glass { backdrop-filter: blur(20px); }
+    .fade-in { animation: fadeIn 0.5s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .slide-in { animation: slideIn 0.3s ease-out; }
+    @keyframes slideIn { from { transform: translateX(-20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    .hover-lift { transition: all 0.2s ease; }
+    .hover-lift:hover { transform: translateY(-2px); }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-50 via-white to-purple-50 min-h-screen">
+  <!-- Login Screen -->
+  <div id="loginScreen" class="fixed inset-0 flex items-center justify-center p-4 fade-in">
+    <div class="glass bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl p-8 max-w-md w-full border border-white/50">
+      <div class="text-center mb-8">
+        <h1 class="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-2">StudyAI</h1>
+        <p class="text-gray-600 text-lg">Your Premium AI Tutor for JEE, NEET & More</p>
+      </div>
+      <form id="loginForm" class="space-y-4">
+        <input type="text" id="name" placeholder="Full Name" class="w-full p-4 rounded-2xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all" required>
+        <input type="text" id="class" placeholder="Class (e.g., 12th)" class="w-full p-4 rounded-2xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all" required>
+        <select id="exam" class="w-full p-4 rounded-2xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all" required>
+          <option value="">Select Exam</option>
+          <option value="JEE">JEE Main/Advanced</option>
+          <option value="NEET">NEET</option>
+          <option value="NDA">NDA</option>
+          <option value="KCET">KCET</option>
+          <option value="Boards">Boards</option>
+        </select>
+        <input type="number" id="dropYear" placeholder="Drop Year (0 if none)" class="w-full p-4 rounded-2xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all" min="0" max="5">
+        <button type="submit" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-4 rounded-2xl font-semibold text-lg hover-lift shadow-lg transition-all">Start Learning 🚀</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div id="dashboard" class="hidden min-h-screen flex">
+    <!-- Sidebar -->
+    <div class="w-64 glass bg-white/80 backdrop-blur-xl border-r border-white/50 p-6 slide-in">
+      <div class="flex items-center mb-8">
+        <div class="w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl flex items-center justify-center mr-3">
+          <span class="text-white font-bold text-sm">SAI</span>
+        </div>
+        <div id="userInfo" class="font-semibold"></div>
+      </div>
+      <div id="modes" class="space-y-2 mb-8">
+        <!-- Modes will be populated by JS -->
+      </div>
+      <button id="logout" class="w-full text-left p-3 rounded-xl text-gray-600 hover:bg-gray-100 hover-lift transition-all">Logout</button>
+    </div>
+
+    <!-- Main Chat Area -->
+    <div class="flex-1 flex flex-col">
+      <!-- Chat Header -->
+      <div class="glass bg-white/80 backdrop-blur-xl border-b border-white/50 p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 id="modeTitle" class="text-2xl font-bold text-gray-800">Select a Mode</h2>
+            <p id="modeDesc" class="text-gray-600 mt-1">Choose from Study, Mental Health, Career or Exam mode</p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <button id="voiceBtn" class="p-2 rounded-xl bg-indigo-100 hover:bg-indigo-200 transition-all">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M7 8a3 3 0 016 0v5a3 3 0 01-6 0V8zM10 9a1 1 0 100 2 1 1 0 000-2z"/><path fill-rule="evenodd" d="M2.25 6.375A2.25 2.25 0 014.5 8.625v3.75a.75.75 0 01-.75.75H2.25a2.25 2.25 0 01-2.25-2.25v-3.75a2.25 2.25 0 012.25-2.25h1.5zm-1.5 3.75a.75.75 0 01.75-.75h1.5a.75.75 0 010 1.5h-1.5a.75.75 0 01-.75-.75zm10.5-3.75a2.25 2.25 0 012.25 2.25v3.75a2.25 2.25 0 01-2.25 2.25h-1.5a2.25 2.25 0 01-2.25-2.25v-3.75a2.25 2.25 0 012.25-2.25h1.5zm-1.5 3.75a.75.75 0 01.75-.75h1.5a.75.75 0 010 1.5h-1.5a.75.75 0 01-.75-.75z"/></svg>
+            </button>
+            <button id="plannerBtn" class="p-2 rounded-xl bg-green-100 hover:bg-green-200 transition-all">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Messages -->
+      <div id="messages" class="flex-1 overflow-y-auto p-6 space-y-4">
+        <!-- Messages appear here -->
+      </div>
+
+      <!-- Input -->
+      <div class="glass bg-white/80 backdrop-blur-xl border-t border-white/50 p-6">
+        <div class="flex space-x-3">
+          <div class="flex-1 relative">
+            <textarea id="messageInput" rows="1" placeholder="Type your message... (Press Enter to send)" class="w-full p-4 pr-12 rounded-2xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none transition-all"></textarea>
+            <button id="sendBtn" class="absolute right-4 top-1/2 -translate-y-1/2 p-2 opacity-50 hover:opacity-100 transition-all">
+              <svg class="w-5 h-5 text-indigo-600" fill="currentColor" viewBox="0 0 20 20"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // State
+    let currentUser = null;
+    let currentMode = null;
+    let messages = [];
+    let recognition = null;
+
+    const modes = [
+      { id: 'study', title: '📚 Study Mode', desc: 'Concept explanations & doubts clearing' },
+      { id: 'mental', title: '🧠 Mental Health', desc: 'Supportive conversations for stress' },
+      { id: 'career', title: '💼 Career Mode', desc: 'India-focused career guidance' },
+      { id: 'exam', title: '⚡ Exam Mode', desc: 'JEE/NEET/NDA/KCET strategies' }
+    ];
+
+    // Init
+    document.addEventListener('DOMContentLoaded', () => {
+      checkLogin();
+      initEvents();
+      initVoice();
+    });
+
+    function checkLogin() {
+      const user = localStorage.getItem('studyAIUser');
+      if (user) {
+        currentUser = JSON.parse(user);
+        showDashboard();
+      }
+    }
+
+    function initEvents() {
+      document.getElementById('loginForm').addEventListener('submit', handleLogin);
+      document.getElementById('logout').addEventListener('click', logout);
+      document.getElementById('messageInput').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          sendMessage();
+        }
+      });
+      document.getElementById('sendBtn').addEventListener('click', sendMessage);
+      document.getElementById('voiceBtn').addEventListener('click', toggleVoice);
+      document.getElementById('plannerBtn').addEventListener('click', generatePlanner);
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      currentUser = {
+        name: document.getElementById('name').value,
+        class: document.getElementById('class').value,
+        exam: document.getElementById('exam').value,
+        dropYear: document.getElementById('dropYear').value || 0
+      };
+      localStorage.setItem('studyAIUser', JSON.stringify(currentUser));
+      showDashboard();
+    }
+
+    function showDashboard() {
+      document.getElementById('loginScreen').classList.add('hidden');
+      document.getElementById('dashboard').classList.remove('hidden');
+      document.getElementById('userInfo').innerHTML = `
+        <div>${currentUser.name}</div>
+        <div class="text-sm text-gray-500">${currentUser.class} | ${currentUser.exam}</div>
+      `;
+      renderModes();
+    }
+
+    function renderModes() {
+      const container = document.getElementById('modes');
+      container.innerHTML = modes.map(mode => `
+        <button onclick="selectMode('${mode.id}')" class="w-full p-4 rounded-2xl text-left hover-lift transition-all ${currentMode === mode.id ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg' : 'bg-gray-100 hover:bg-gray-200'} border hover:border-indigo-200">
+          <div class="font-semibold">${mode.title}</div>
+          <div class="text-sm opacity-80">${mode.desc}</div>
+        </button>
+      `).join('');
+    }
+
+    function selectMode(modeId) {
+      currentMode = modeId;
+      document.getElementById('modeTitle').textContent = modes.find(m => m.id === modeId).title;
+      document.getElementById('modeDesc').textContent = modes.find(m => m.id === modeId).desc;
+      renderModes();
+      messages = [];
+      renderMessages();
+    }
+
+    async function sendMessage() {
+      const input = document.getElementById('messageInput');
+      const text = input.value.trim();
+      if (!text || !currentMode) return;
+
+      addMessage('user', text);
+      input.value = '';
+
+      try {
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: text, mode: currentMode, user: currentUser })
+        });
+        const data = await response.json();
+        addMessage('assistant', data.response);
+      } catch (error) {
+        addMessage('assistant', 'Sorry, something went wrong. Please try again.');
+      }
+    }
+
+    function addMessage(role, content) {
+      messages.push({ role, content });
+      renderMessages();
+    }
+
+    function renderMessages() {
+      const container = document.getElementById('messages');
+      container.innerHTML = messages.map(msg => `
+        <div class="flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}">
+          <div class="max-w-md ${msg.role === 'user' ? 'bg-indigo-600 text-white' : 'glass bg-white/80 backdrop-blur-xl'} p-4 rounded-2xl shadow-lg hover-lift ${msg.role === 'user' ? 'rounded-br-sm' : 'rounded-bl-sm'}">
+            ${msg.content}
+          </div>
+        </div>
+      `).join('');
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function initVoice() {
+      if ('webkitSpeechRecognition' in window) {
+        recognition = new webkitSpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = 'en-IN';
+        recognition.onresult = (e) => {
+          document.getElementById('messageInput').value = e.results[0][0].transcript;
+        };
+      }
+    }
+
+    function toggleVoice() {
+      if (recognition) {
+        recognition.start();
+        document.getElementById('voiceBtn').style.background = '#dbeafe';
+        setTimeout(() => document.getElementById('voiceBtn').style.background = '', 3000);
+      }
+    }
+
+    function generatePlanner() {
+      const planner = `Smart Study Planner for ${currentUser.exam}:
+
+- Week 1-4: ${currentUser.exam} Mock Tests Daily
+- Daily 2hr: Weak Subjects
+- Mental Health: 30min meditation
+- Sleep: 7hrs mandatory`;
+      addMessage('assistant', planner);
+    }
+
+    function logout() {
+      localStorage.removeItem('studyAIUser');
+      location.reload();
+    }
+  </script>
+</body>
+</html>
